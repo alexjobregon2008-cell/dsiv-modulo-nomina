@@ -1,0 +1,158 @@
+erDiagram
+	USUARIOS {
+		int UsuarioID PK
+		nvarchar NombreUsuario UK
+		nvarchar ContrasenaHash
+		nvarchar Correo UK
+		nvarchar Rol
+		bit Activo
+		tinyint IntentosFallidos
+		datetime2 UltimoIntentoFallido
+		bit DebeCambiarContrasena
+		datetime2 FechaCreacion
+	}
+	BITACORA {
+		int BitacoraID PK
+		int UsuarioID FK
+		nvarchar Accion
+		nvarchar Descripcion
+		sysname TablaAfectada
+		int RegistroID
+		datetime2 FechaHora
+	}
+	DEPARTAMENTOS {
+		int DepartamentoID PK
+		nvarchar Nombre UK
+		nvarchar Descripcion
+		bit Activo
+	}
+	CARGOS {
+		int CargoID PK
+		int DepartamentoID FK
+		nvarchar Nombre
+		decimal SalarioMinimo
+		decimal SalarioMaximo
+		bit Activo
+	}
+	EMPLEADOS {
+		int EmpleadoID PK
+		nvarchar Nombre UK
+		int DepartamentoID FK
+		int CargoID FK
+		decimal SalarioBase
+		nvarchar TipoContrato
+		date FechaInicioContrato
+		bit Activo
+	}
+	TURNOS {
+		int TurnoID PK
+		nvarchar Nombre UK
+		time HoraInicio
+		time HoraFin
+		nvarchar TipoJornada
+		decimal HorasProgramadas
+		bit Activo
+	}
+	EMPLEADOTURNO {
+		int EmpleadoTurnoID PK
+		int EmpleadoID FK
+		int TurnoID FK
+		date FechaDesde
+		date FechaHasta
+		bit Activo
+	}
+	FERIADOS {
+		int FeriadoID PK
+		date Fecha UK
+		nvarchar Nombre
+		nvarchar TipoFeriado
+		bit EsDiaNoLaborable
+		bit Activo
+	}
+	ASISTENCIAS {
+		int AsistenciaID PK
+		int EmpleadoID FK
+		int TurnoID FK
+		date Fecha
+		time HoraEntrada
+		time HoraSalida
+		nvarchar TipoRegistro
+		nvarchar Estado
+		decimal HorasProgramadas
+		decimal HorasTrabajadas
+		decimal HorasNormales
+		int FeriadoID FK
+		bit GeneraDescuento
+	}
+	ASISTENCIAHORAS {
+		int AsistenciaHoraID PK
+		int AsistenciaID FK
+		time HoraEntrada
+		time HoraSalida
+		decimal HorasNormales
+		decimal HorasExtras
+	}
+	NOMINAS {
+		int NominaID PK
+		date PeriodoDesde
+		date PeriodoHasta
+		date FechaPago
+		nvarchar Estado
+		decimal TotalDevengado
+		decimal TotalDeducciones
+		decimal TotalNeto
+	}
+	NOMINADETALLE {
+		int NominaDetalleID PK
+		int NominaID FK
+		int EmpleadoID FK
+		decimal SalarioBase
+		decimal TotalDevengado
+		decimal TotalDeducciones
+		decimal NetoPagar
+	}
+	CONCEPTOSNOMINA {
+		int ConceptoID PK
+		nvarchar Codigo UK
+		nvarchar Nombre
+		nvarchar Tipo
+		bit EsDeduccion
+		bit Activo
+	}
+	REGLASNOMINAPANAMA {
+		int ReglaID PK
+		nvarchar CodigoRegla
+		nvarchar Nombre
+		decimal Valor
+		decimal Porcentaje
+		date VigenciaDesde
+		date VigenciaHasta
+		nvarchar FuenteLegal
+		bit Activo
+	}
+	NOMINACONCEPTO {
+		int NominaConceptoID PK
+		int NominaDetalleID FK
+		int ConceptoID FK
+		int AsistenciaID FK
+		decimal BaseCalculo
+		decimal Cantidad
+		decimal Monto
+	}
+
+	USUARIOS ||--o{ BITACORA : registra
+	DEPARTAMENTOS ||--o{ CARGOS : contiene
+	DEPARTAMENTOS ||--o{ EMPLEADOS : organiza
+	CARGOS ||--o{ EMPLEADOS : asigna
+	EMPLEADOS ||--o{ EMPLEADOTURNO : tiene
+	TURNOS ||--o{ EMPLEADOTURNO : asigna
+	EMPLEADOS ||--o{ ASISTENCIAS : registra
+	TURNOS o|--o{ ASISTENCIAS : corresponde
+	FERIADOS o|--o{ ASISTENCIAS : afecta
+	ASISTENCIAS ||--o{ ASISTENCIAHORAS : detalla
+	NOMINAS ||--o{ NOMINADETALLE : contiene
+	EMPLEADOS ||--o{ NOMINADETALLE : recibe
+	NOMINADETALLE ||--o{ NOMINACONCEPTO : desglosa
+	CONCEPTOSNOMINA ||--o{ NOMINACONCEPTO : aplica
+	ASISTENCIAS o|--o{ NOMINACONCEPTO : origina
+	USUARIOS o|--o| EMPLEADOS : vincula

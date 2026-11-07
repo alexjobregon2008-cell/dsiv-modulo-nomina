@@ -1,0 +1,32 @@
+namespace MODULO.CSharp;
+
+public static class Sesion
+{
+    public static int? UsuarioID { get; private set; }
+    public static string NombreUsuario { get; private set; } = string.Empty;
+    public static string Rol { get; private set; } = string.Empty;
+    public static bool DebeCambiarContrasena { get; private set; }
+
+    public static bool EstaIniciada => UsuarioID.HasValue;
+
+    public static void Iniciar(int usuarioId, string nombreUsuario, string rol, bool debeCambiarContrasena = false)
+    {
+        UsuarioID = usuarioId;
+        NombreUsuario = nombreUsuario;
+        Rol = rol;
+        DebeCambiarContrasena = debeCambiarContrasena;
+    }
+
+    public static void Cerrar()
+    {
+        UsuarioID = null;
+        NombreUsuario = string.Empty;
+        Rol = string.Empty;
+        DebeCambiarContrasena = false;
+    }
+
+    public static void MarcarContrasenaActualizada()
+    {
+        DebeCambiarContrasena = false;
+    }
+}

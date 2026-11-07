@@ -1,0 +1,8 @@
+Estos scripts se conservaron como historial de desarrollo y no forman parte de la ejecución final:
+
+- BaseDatos_MODULO.sql: esquema antiguo del proyecto VB.
+- ActualizarDesbloqueo.sql: actualización incremental del desbloqueo administrativo.
+- ActualizarUsuariosContrasenas.sql: actualización incremental de usuarios y contraseñas.
+
+Para una instalación limpia se debe ejecutar únicamente:
+BaseDatos_MODULO_Final.sql

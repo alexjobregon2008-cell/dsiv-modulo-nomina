@@ -1,0 +1,13 @@
+﻿USE MODULO_Final;
+GO
+UPDATE dbo.Usuarios
+SET ContrasenaHash = N'$2a$12$P6v1znf8rxZ0QL2PzW8eQeF7vkJcxK.oRlNGzXSniaH75jg6F3Cny',
+	Activo = 1,
+	IntentosFallidos = 0,
+	UltimoIntentoFallido = NULL
+WHERE NombreUsuario = N'admin';
+GO
+SELECT NombreUsuario, ContrasenaHash, LEN(ContrasenaHash) AS Largo
+FROM dbo.Usuarios
+WHERE NombreUsuario = N'admin';
+GO

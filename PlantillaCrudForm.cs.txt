@@ -1,0 +1,46 @@
+using System.Data;
+using Microsoft.Data.SqlClient;
+
+namespace MODULO.CSharp;
+
+public partial class EntidadForm : Form
+{
+	private readonly BindingSource _origen = new();
+
+	public EntidadForm()
+	{
+		InitializeComponent();
+		CargarDatos();
+	}
+
+	private void CargarDatos()
+	{
+		string filtro = txtBuscar.Text.Trim();
+		DataTable datos = ConexionBD.ObtenerDataTable(
+			"SELECT EntidadID, Nombre FROM dbo.Entidades WHERE Nombre LIKE @Filtro ORDER BY Nombre;",
+			new SqlParameter("@Filtro", SqlDbType.NVarChar, 100) { Value = $"%{filtro}%" });
+		_origen.DataSource = datos;
+		dgvEntidades.DataSource = _origen;
+	}
+
+	private void btnGuardar_Click(object sender, EventArgs e)
+	{
+		ConexionBD.EjecutarNonQuery(
+			"INSERT INTO dbo.Entidades (Nombre) VALUES (@Nombre);",
+			new SqlParameter("@Nombre", SqlDbType.NVarChar, 100) { Value = txtNombre.Text.Trim() });
+		BitacoraService.Registrar("CREAR", "Se creó una entidad", "Entidades");
+		CargarDatos();
+	}
+
+	private void btnEliminar_Click(object sender, EventArgs e)
+	{
+		if (dgvEntidades.CurrentRow?.Cells["EntidadID"].Value is not int entidadId)
+			return;
+
+		ConexionBD.EjecutarNonQuery(
+			"DELETE FROM dbo.Entidades WHERE EntidadID = @EntidadID;",
+			new SqlParameter("@EntidadID", SqlDbType.Int) { Value = entidadId });
+		BitacoraService.Registrar("ELIMINAR", $"Se eliminó la entidad {entidadId}", "Entidades", entidadId);
+		CargarDatos();
+	}
+}

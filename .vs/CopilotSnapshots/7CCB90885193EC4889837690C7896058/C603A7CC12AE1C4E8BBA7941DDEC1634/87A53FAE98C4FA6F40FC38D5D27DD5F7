@@ -1,0 +1,59 @@
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
+
+namespace MODULO.CSharp;
+
+public static class ConexionBD
+{
+    public const string CadenaConexion =
+        "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MODULO;Integrated Security=True;TrustServerCertificate=True;";
+
+    public static SqlConnection CrearConexion()
+    {
+        return new SqlConnection(CadenaConexion);
+    }
+
+    public static int EjecutarNonQuery(string consulta, params SqlParameter[] parametros)
+    {
+        using SqlConnection conexion = CrearConexion();
+        using SqlCommand comando = CrearComando(conexion, consulta, parametros);
+        conexion.Open();
+        return comando.ExecuteNonQuery();
+    }
+
+    public static object? EjecutarEscalar(string consulta, params SqlParameter[] parametros)
+    {
+        using SqlConnection conexion = CrearConexion();
+        using SqlCommand comando = CrearComando(conexion, consulta, parametros);
+        conexion.Open();
+        return comando.ExecuteScalar();
+    }
+
+    public static DataTable ObtenerDataTable(string consulta, params SqlParameter[] parametros)
+    {
+        using SqlConnection conexion = CrearConexion();
+        using SqlCommand comando = CrearComando(conexion, consulta, parametros);
+        using SqlDataAdapter adaptador = new(comando);
+        DataTable tabla = new();
+        adaptador.Fill(tabla);
+        return tabla;
+    }
+
+    public static DataTable EjecutarProcedimiento(string nombreProcedimiento, params SqlParameter[] parametros)
+    {
+        using SqlConnection conexion = CrearConexion();
+        using SqlCommand comando = CrearComando(conexion, nombreProcedimiento, parametros);
+        comando.CommandType = CommandType.StoredProcedure;
+        using SqlDataAdapter adaptador = new(comando);
+        DataTable tabla = new();
+        adaptador.Fill(tabla);
+        return tabla;
+    }
+
+    private static SqlCommand CrearComando(SqlConnection conexion, string consulta, SqlParameter[] parametros)
+    {
+        SqlCommand comando = new(consulta, conexion);
+        comando.Parameters.AddRange(parametros);
+        return comando;
+    }
+}
