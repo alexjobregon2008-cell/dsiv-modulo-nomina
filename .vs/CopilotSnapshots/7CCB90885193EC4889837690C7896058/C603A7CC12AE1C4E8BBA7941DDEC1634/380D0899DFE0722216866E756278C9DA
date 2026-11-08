@@ -1,3 +1,0 @@
-﻿usingusing BCrypt.Net;
-
-Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("admin123", workFactor: 12));
