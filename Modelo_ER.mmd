@@ -30,6 +30,7 @@ erDiagram
 		int CargoID PK
 		int DepartamentoID FK
 		nvarchar Nombre
+		nvarchar Descripcion
 		decimal SalarioMinimo
 		decimal SalarioMaximo
 		bit Activo
@@ -41,8 +42,10 @@ erDiagram
 		int CargoID FK
 		decimal SalarioBase
 		nvarchar TipoContrato
+		bit AplicaDescuentos
 		date FechaInicioContrato
 		bit Activo
+		datetime2 FechaCreacion
 	}
 	TURNOS {
 		int TurnoID PK
@@ -81,26 +84,34 @@ erDiagram
 		decimal HorasProgramadas
 		decimal HorasTrabajadas
 		decimal HorasNormales
+		bit EsDomingo
+		bit EsFeriado
 		int FeriadoID FK
+		bit Justificada
 		bit GeneraDescuento
+		nvarchar Observacion
 	}
 	ASISTENCIAHORAS {
 		int AsistenciaHoraID PK
 		int AsistenciaID FK
-		time HoraEntrada
-		time HoraSalida
-		decimal HorasNormales
-		decimal HorasExtras
+		nvarchar TipoHora
+		decimal CantidadHoras
+		bit HorasAprobadas
+		int AprobadoPorUsuarioID FK
+		datetime2 FechaAprobacion
 	}
 	NOMINAS {
 		int NominaID PK
+		date FechaPago
 		date PeriodoDesde
 		date PeriodoHasta
-		date FechaPago
+		nvarchar PeriodoPagado
 		nvarchar Estado
-		decimal TotalDevengado
+		decimal TotalBruto
 		decimal TotalDeducciones
+		decimal TotalAportesPatronales
 		decimal TotalNeto
+		datetime2 FechaCreacion
 	}
 	NOMINADETALLE {
 		int NominaDetalleID PK
@@ -109,22 +120,30 @@ erDiagram
 		decimal SalarioBase
 		decimal TotalDevengado
 		decimal TotalDeducciones
-		decimal NetoPagar
+		decimal TotalAportesPatronales
+		decimal SalarioNeto
 	}
 	CONCEPTOSNOMINA {
 		int ConceptoID PK
-		nvarchar Codigo UK
+		varchar Codigo UK
 		nvarchar Nombre
-		nvarchar Tipo
-		bit EsDeduccion
+		nvarchar TipoConcepto
+		nvarchar Naturaleza
+		nvarchar AplicaA
 		bit Activo
 	}
 	REGLASNOMINAPANAMA {
 		int ReglaID PK
-		nvarchar CodigoRegla
-		nvarchar Nombre
-		decimal Valor
+		int ConceptoID FK
+		varchar CodigoRegla
+		nvarchar Descripcion
+		nvarchar TipoCalculo
 		decimal Porcentaje
+		decimal Multiplicador
+		decimal MontoDesde
+		decimal MontoHasta
+		decimal Valor
+		nvarchar Periodicidad
 		date VigenciaDesde
 		date VigenciaHasta
 		nvarchar FuenteLegal
@@ -135,9 +154,13 @@ erDiagram
 		int NominaDetalleID FK
 		int ConceptoID FK
 		int AsistenciaID FK
+		int AsistenciaHoraID FK
 		decimal BaseCalculo
 		decimal Cantidad
+		decimal PorcentajeAplicado
 		decimal Monto
+		bit EsPatronal
+		nvarchar Descripcion
 	}
 
 	USUARIOS ||--o{ BITACORA : registra
@@ -155,4 +178,6 @@ erDiagram
 	NOMINADETALLE ||--o{ NOMINACONCEPTO : desglosa
 	CONCEPTOSNOMINA ||--o{ NOMINACONCEPTO : aplica
 	ASISTENCIAS o|--o{ NOMINACONCEPTO : origina
-	USUARIOS o|--o| EMPLEADOS : vincula
+	CONCEPTOSNOMINA o|--o{ REGLASNOMINAPANAMA : parametriza
+	USUARIOS o|--o{ ASISTENCIAHORAS : aprueba
+	ASISTENCIAHORAS o|--o{ NOMINACONCEPTO : genera
