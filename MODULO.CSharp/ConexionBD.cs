@@ -18,7 +18,7 @@ public static class ConexionBD
         using SqlConnection conexion = CrearConexion();
         using SqlCommand comando = CrearComando(conexion, nombreProcedimiento, parametros);
         comando.CommandType = CommandType.StoredProcedure;
-        conexion.Open();
+        AbrirConexion(conexion);
         return comando.ExecuteNonQuery();
     }
 
@@ -27,7 +27,7 @@ public static class ConexionBD
         using SqlConnection conexion = CrearConexion();
         using SqlCommand comando = CrearComando(conexion, nombreProcedimiento, parametros);
         comando.CommandType = CommandType.StoredProcedure;
-        conexion.Open();
+        AbrirConexion(conexion);
         return comando.ExecuteScalar();
     }
 
@@ -35,7 +35,7 @@ public static class ConexionBD
     {
         using SqlConnection conexion = CrearConexion();
         using SqlCommand comando = CrearComando(conexion, consulta, parametros);
-        conexion.Open();
+        AbrirConexion(conexion);
         return comando.ExecuteNonQuery();
     }
 
@@ -43,7 +43,7 @@ public static class ConexionBD
     {
         using SqlConnection conexion = CrearConexion();
         using SqlCommand comando = CrearComando(conexion, consulta, parametros);
-        conexion.Open();
+        AbrirConexion(conexion);
         return comando.ExecuteScalar();
     }
 
@@ -51,6 +51,7 @@ public static class ConexionBD
     {
         using SqlConnection conexion = CrearConexion();
         using SqlCommand comando = CrearComando(conexion, consulta, parametros);
+        AbrirConexion(conexion);
         using SqlDataAdapter adaptador = new(comando);
         DataTable tabla = new();
         adaptador.Fill(tabla);
@@ -62,6 +63,7 @@ public static class ConexionBD
         using SqlConnection conexion = CrearConexion();
         using SqlCommand comando = CrearComando(conexion, nombreProcedimiento, parametros);
         comando.CommandType = CommandType.StoredProcedure;
+        AbrirConexion(conexion);
         using SqlDataAdapter adaptador = new(comando);
         DataTable tabla = new();
         adaptador.Fill(tabla);
@@ -73,5 +75,17 @@ public static class ConexionBD
         SqlCommand comando = new(consulta, conexion);
         comando.Parameters.AddRange(parametros);
         return comando;
+    }
+
+    private static void AbrirConexion(SqlConnection conexion)
+    {
+        conexion.Open();
+        using SqlCommand comandoContexto = new("sys.sp_set_session_context", conexion)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
+        comandoContexto.Parameters.Add("@key", SqlDbType.NVarChar, 128).Value = "UsuarioID";
+        comandoContexto.Parameters.Add("@value", SqlDbType.Int).Value = (object?)Sesion.UsuarioID ?? DBNull.Value;
+        comandoContexto.ExecuteNonQuery();
     }
 }

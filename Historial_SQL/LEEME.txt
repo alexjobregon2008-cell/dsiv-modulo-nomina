@@ -3,6 +3,7 @@ Estos scripts se conservaron como historial de desarrollo y no forman parte de l
 - BaseDatos_MODULO.sql: esquema antiguo del proyecto VB.
 - ActualizarDesbloqueo.sql: actualización incremental del desbloqueo administrativo.
 - ActualizarUsuariosContrasenas.sql: actualización incremental de usuarios y contraseñas.
+- Modelo_ER.mmd: modelo editable sincronizado con BaseDatos_MODULO_Final.sql.
 
 Para una instalación limpia se debe ejecutar únicamente:
 BaseDatos_MODULO_Final.sql
